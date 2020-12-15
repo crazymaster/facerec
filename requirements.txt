@@ -1,0 +1,10 @@
+# local package
+# -e .
+
+# external requirements
+Pillow
+numpy
+
+# development specific requirements
+flake8
+mypy
