@@ -4,6 +4,8 @@
 # GLOBALS                                                                       #
 #################################################################################
 
+PYTHON = python
+PIP = pip
 
 #################################################################################
 # COMMANDS                                                                      #
@@ -19,16 +21,17 @@ clean:
 
 ## Install Python Dependencies
 setup:
-	pip3 install -r requirements.txt --upgrade --user
+	$(PIP) install -U pip setuptools wheel
+	$(PIP) install -r requirements.txt --upgrade
 
 ## Lint using flake8 and mypy
 lint:
-	python3 -m flake8 jatr
-	python3 -m mypy jatr
+	$(PYTHON) -m flake8 facerec
+	$(PYTHON) -m mypy facerec
 
 ## Run tests
 test:
-	python3 -m doctest .
+	$(PYTHON) -m doctest .
 
 #################################################################################
 # PROJECT RULES                                                                 #
