@@ -21,28 +21,28 @@ def rgb2hsv(rgb: np.ndarray) -> np.ndarray:
     array([[[217,  79,  93],
             [ 91,  35,  78]]])
     >>> rgb2hsv(np.array([[[215, 79, 93], [90, 35, 78], [230, 133, 116]]]))
-    array([[[354,  63,  84],
-            [314,  61,  35],
+    array([[[353,  63,  84],
+            [313,  61,  35],
             [  8,  49,  90]]])
     >>> rgb2hsv(np.array([[[0, 0, 0], [100, 100, 100], [255, 255 , 255]]]))
     array([[[  0,   0,   0],
             [  0,   0,  39],
             [  0,   0, 100]]])
     >>> rgb2hsv(np.array([[[192, 96, 100]]]))
-    array([[[358,  50,  75]]])
+    array([[[357,  50,  75]]])
     """
 
     input_shape = rgb.shape
-    rgb = rgb.reshape(-1, 3).astype('int')
+    rgb = rgb.reshape(-1, 3).astype('float')
     r, g, b = rgb[:, 0], rgb[:, 1], rgb[:, 2]
 
     maxc = np.maximum(np.maximum(r, g), b)
     minc = np.minimum(np.minimum(r, g), b)
 
-    v = 100 * maxc // 255
+    v = 100 * maxc / 255
 
     deltac = maxc - minc
-    s = np.floor_divide(100 * deltac, maxc, where=(maxc != 0))
+    s = np.divide(100 * deltac, maxc, where=(maxc != 0))
     s[maxc == 0] = 0
 
     h = np.empty_like(v)
@@ -54,7 +54,7 @@ def rgb2hsv(rgb: np.ndarray) -> np.ndarray:
     h[h < 0] += 360
 
     res = np.dstack([h, s, v])
-    return res.reshape(input_shape)
+    return res.reshape(input_shape).astype('int')
 
 
 def hsv2rgb(hsv: np.ndarray) -> np.ndarray:
@@ -65,37 +65,37 @@ def hsv2rgb(hsv: np.ndarray) -> np.ndarray:
     Returns:
         np.ndarray: RGB画像
     >>> hsv2rgb(np.array([[[215, 79, 93], [90, 35, 78]]]))
-    array([[[ 50, 127, 237],
-            [164, 199, 129]]], dtype=uint8)
+    array([[[ 49, 127, 237],
+            [164, 198, 129]]], dtype=uint8)
     >>> hsv2rgb(np.array([[[0, 0, 0], [0, 100, 100], [360, 100, 100]]]))
     array([[[  0,   0,   0],
             [255,   0,   0],
             [255,   0,   0]]], dtype=uint8)
     >>> hsv2rgb(np.array([[[358,  50,  75]]]))
-    array([[[191,  96,  99]]], dtype=uint8)
+    array([[[191,  95,  98]]], dtype=uint8)
     """
 
     input_shape = hsv.shape
-    hsv = hsv.reshape(-1, 3).astype('int')
+    hsv = hsv.reshape(-1, 3).astype('float')
     h, s, v = hsv[:, 0], hsv[:, 1], hsv[:, 2]
 
-    maxc = np.round(255 * v / 100).astype('int')
-    minc = np.round(maxc - maxc * s / 100).astype('int')
+    maxc = 255 * v / 100
+    minc = maxc - maxc * s / 100
 
     i = h // 60
     deltac = maxc - minc
     maxc, minc = maxc.reshape(-1, 1), minc.reshape(-1, 1)
     deltac, h = deltac.reshape(-1, 1), h.reshape(-1, 1)
-    x1 = deltac * np.abs(120 - h) // 60 + minc
-    x2 = deltac * np.abs(240 - h) // 60 + minc
+    x1 = deltac * np.abs(120 - h) / 60 + minc
+    x2 = deltac * np.abs(240 - h) / 60 + minc
 
     rgb = np.zeros_like(hsv)
-    rgb[i == 0] = np.hstack([maxc, deltac * h // 60 + minc, minc])[i == 0]
+    rgb[i == 0] = np.hstack([maxc, deltac * h / 60 + minc, minc])[i == 0]
     rgb[i == 1] = np.hstack([x1, maxc, minc])[i == 1]
     rgb[i == 2] = np.hstack([minc, maxc, x1])[i == 2]
     rgb[i == 3] = np.hstack([minc, x2, maxc])[i == 3]
     rgb[i == 4] = np.hstack([x2, minc, maxc])[i == 4]
-    rgb[(i == 5) | (i == 6)] = np.hstack([maxc, minc, deltac * (360 - h) // 60 + minc])[(i == 5) | (i == 6)]
+    rgb[(i == 5) | (i == 6)] = np.hstack([maxc, minc, deltac * (360 - h) / 60 + minc])[(i == 5) | (i == 6)]
     rgb[s == 0] = np.hstack([maxc, maxc, maxc])[s == 0]
 
     return rgb.reshape(input_shape).astype(np.uint8)
