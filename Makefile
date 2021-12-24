@@ -11,18 +11,18 @@ PIP = pip3
 # COMMANDS                                                                      #
 #################################################################################
 
-## Do All
-all: setup lint
-
-## Delete all generated files
-clean:
-	find . -type f -name "*.py[co]" -delete
-	find . -type d -name "__pycache__" -delete
-
 ## Install Python Dependencies
 setup:
 	$(PIP) install -U pip setuptools wheel
 	$(PIP) install -r requirements.txt --upgrade
+
+## Make Dataset
+dataset:
+	mkdir -p data/fddb
+	wget http://vis-www.cs.umass.edu/fddb/originalPics.tar.gz -O data/fddb/originalPics.tar.gz
+	tar -xf data/fddb/originalPics.tar.gz -C data/fddb
+	# wget http://vis-www.cs.umass.edu/fddb/FDDB-folds.tgz -O data/fddb/FDDB-folds.tgz
+	# tar -xf data/fddb/FDDB-folds.tgz -C data/fddb
 
 ## Lint using flake8 and mypy
 lint:
@@ -33,14 +33,10 @@ lint:
 test:
 	$(PYTHON) -m doctest facerec/*.py
 
-## Make Dataset
-dataset:
-	mkdir -p data/fddb
-	wget http://vis-www.cs.umass.edu/fddb/originalPics.tar.gz -O data/fddb/originalPics.tar.gz
-	tar -xf data/fddb/originalPics.tar.gz -C data/fddb
-	# wget http://vis-www.cs.umass.edu/fddb/FDDB-folds.tgz -O data/fddb/FDDB-folds.tgz
-	# tar -xf data/fddb/FDDB-folds.tgz -C data/fddb
-
+## Delete all generated files
+clean:
+	find . -type f -name "*.py[co]" -delete
+	find . -type d -name "__pycache__" -delete
 
 #################################################################################
 # PROJECT RULES                                                                 #
@@ -84,7 +80,6 @@ help:
 		s/\\n/ /g; \
 		p; \
 	}" ${MAKEFILE_LIST} \
-	| LC_ALL='C' sort --ignore-case \
 	| awk -F '---' \
 		-v ncol=$$(tput cols) \
 		-v indent=19 \
