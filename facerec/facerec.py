@@ -106,7 +106,7 @@ def trim(array, x, y, width, height):
     return array[y:y + height, x:x+width]
 
 
-def region_hist(img: np.ndarray, num_split: int = 16) -> np.ndarray:
+def region_hist(img: np.ndarray, num_split: int = 10) -> np.ndarray:
     """RGB画像をn*nに分割し、各領域についてヒストグラムを求める
 
     Args:
@@ -132,18 +132,44 @@ def region_hist(img: np.ndarray, num_split: int = 16) -> np.ndarray:
     return region_hists
 
 
-def cos_sim_matrix(A_mat, B_mat):
+def region_filter(img: np.ndarray, filter: np.ndarray, num_split: int = 10) -> np.ndarray:
+    """RGB画像をn*nに分割し、各領域についてフィルターを適用する
+    Args:
+        img (np.ndarray): RGB画像
+        filter (np.ndarray): フィルター行列
+        num_split (int): 分割数
+    """
+
+    h, w, _ = img.shape
+    # print(img.shape)
+    img_copy = np.copy(img).astype('float')
+
+    for h_count in range(num_split):
+        pos_h = h // num_split * h_count
+        for w_count in range(num_split):
+            pos_w = w // num_split * w_count
+            trimed_img = trim(img_copy, pos_w, pos_h, w // num_split, h // num_split)
+            # print(pos_w, pos_h, w // num_split, h // num_split)
+            trimed_img *= filter[h_count, w_count]
+
+            # plt.imshow(im_trim)
+            # plt.show()
+
+    return img_copy.astype(np.uint8)
+
+
+def cos_sim(A_mat, B_vec):
     """
     item-vevtorの行列(またはベクトル)が与えられた際にitem-vevtor間のコサイン類似度行列を求める
     """
-    d = A_mat * B_mat.T  # 各ベクトル同士の内積を要素とする行列
+    d = np.dot(A_mat, B_vec)  # 各ベクトル同士の内積を要素とする行列
 
     # 各ベクトルの大きさの平方根
-    A_norm = (A_mat ** 2).sum(axis=2, keepdims=True) ** .5
-    B_norm = (B_mat ** 2).sum(axis=0, keepdims=True) ** .5
+    A_norm = (A_mat ** 2).sum(axis=1, keepdims=True) ** .5
+    B_norm = (B_vec ** 2).sum(axis=0, keepdims=True) ** .5
 
-    # それぞれのベクトルの大きさの平方根で割っている
-    return d / A_norm / B_norm.T
+    # それぞれのベクトルの大きさの平方根で割る
+    return d / A_norm.T / B_norm
 
 
 if __name__ == "__main__":
