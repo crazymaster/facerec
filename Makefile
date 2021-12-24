@@ -33,6 +33,15 @@ lint:
 test:
 	$(PYTHON) -m doctest facerec/*.py
 
+## Make Dataset
+dataset:
+	mkdir -p data/fddb
+	wget http://vis-www.cs.umass.edu/fddb/originalPics.tar.gz -O data/fddb/originalPics.tar.gz
+	tar -xf data/fddb/originalPics.tar.gz -C data/fddb
+	# wget http://vis-www.cs.umass.edu/fddb/FDDB-folds.tgz -O data/fddb/FDDB-folds.tgz
+	# tar -xf data/fddb/FDDB-folds.tgz -C data/fddb
+
+
 #################################################################################
 # PROJECT RULES                                                                 #
 #################################################################################

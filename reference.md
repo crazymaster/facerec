@@ -7,3 +7,6 @@
 * [HSV色空間とは : PEKO STEP](https://www.peko-step.com/html/hsv.html)
 * [RGBとHSV・HSBの相互変換ツールと変換計算式 - PEKO STEP](https://www.peko-step.com/tool/hsvrgb.html)
 * [numpy RGB to HSV](https://gist.github.com/PolarNick239/691387158ff1c41ad73c)
+* [顔画像データセット - deepblue](https://deepblue-ts.co.jp/image-processing/face-image-dataset/)
+* [コサイン類似度行列？それNumPyですぐ出せるよ - Qiita](https://qiita.com/fam_taro/items/dac3b1bcfc01461a0120)
+* [python - create cosine similarity matrix numpy - Stack Overflow](https://stackoverflow.com/questions/41905029/create-cosine-similarity-matrix-numpy)

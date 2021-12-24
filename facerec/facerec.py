@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def read_img(file: str) -> np.ndarray:
@@ -101,11 +102,57 @@ def hsv2rgb(hsv: np.ndarray) -> np.ndarray:
     return rgb.reshape(input_shape).astype(np.uint8)
 
 
+def trim(array, x, y, width, height):
+    return array[y:y + height, x:x+width]
+
+
+def region_hist(img: np.ndarray, num_split: int = 16) -> np.ndarray:
+    """RGB画像をn*nに分割し、各領域についてヒストグラムを求める
+
+    Args:
+        img (np.ndarray): RGB画像
+        num_split (int): 分割数
+    """
+
+    h, w, _ = img.shape
+    # print(img.shape)
+    region_hists = np.empty((num_split, num_split, 360))
+
+    for h_count in range(num_split):
+        pos_h = h // num_split * h_count
+        for w_count in range(num_split):
+            pos_w = w // num_split * w_count
+            im_trim = trim(img, pos_w, pos_h, w // num_split, h // num_split)
+            # print(pos_w, pos_h, w // num_split, h // num_split)
+            hist, _ = np.histogram(rgb2hsv(im_trim)[:, :, 0].ravel(), range=(0, 360), bins=360, density=True)
+            region_hists[h_count, w_count, :] = hist
+            # plt.imshow(im_trim)
+            # plt.show()
+
+    return region_hists
+
+
+def cos_sim_matrix(A_mat, B_mat):
+    """
+    item-vevtorの行列(またはベクトル)が与えられた際にitem-vevtor間のコサイン類似度行列を求める
+    """
+    d = A_mat * B_mat.T  # 各ベクトル同士の内積を要素とする行列
+
+    # 各ベクトルの大きさの平方根
+    A_norm = (A_mat ** 2).sum(axis=2, keepdims=True) ** .5
+    B_norm = (B_mat ** 2).sum(axis=0, keepdims=True) ** .5
+
+    # それぞれのベクトルの大きさの平方根で割っている
+    return d / A_norm / B_norm.T
+
+
 if __name__ == "__main__":
     img = read_img('./data/lena.jpg')
     print(img.shape)
-    hsv_img = rgb2hsv(img)
-    rgb_img = hsv2rgb(hsv_img)
+    hist = region_hist(img, 2)
+
+    # hsv_img = rgb2hsv(img)
+    # rgb_img = hsv2rgb(hsv_img)
     # pil_img = Image.fromarray(img)
     # pil_img.save('../data/temp/lena_save_pillow.jpg')
 

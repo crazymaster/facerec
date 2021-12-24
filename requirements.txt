@@ -4,6 +4,8 @@
 # external requirements
 Pillow
 numpy
+matplotlib
+seaborn
 
 # development specific requirements
 flake8
