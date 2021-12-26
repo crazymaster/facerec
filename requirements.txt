@@ -6,7 +6,7 @@ Pillow
 numpy
 matplotlib
 japanize-matplotlib
-# seaborn
+seaborn
 
 # development specific requirements
 flake8
