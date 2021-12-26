@@ -5,6 +5,7 @@
 Pillow
 numpy
 matplotlib
+japanize-matplotlib
 # seaborn
 
 # development specific requirements
